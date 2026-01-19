@@ -77,11 +77,20 @@ export function AgendaClient() {
         setWeekSessions(thisWeek);
         setMonthSessions(thisMonth);
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error("Failed to generate agenda:", error);
+      
+      // Check if it's a quota error
+      const isQuotaError = error?.message?.includes('quota') || 
+                          error?.message?.includes('QuotaExceeded') ||
+                          error?.status === 'RESOURCE_EXHAUSTED' ||
+                          error?.code === 429;
+      
       toast({
-        title: "Error",
-        description: "Could not generate your agenda. Please try again.",
+        title: isQuotaError ? "API Quota Exceeded" : "Error",
+        description: isQuotaError 
+          ? "Your Google AI API quota has been exceeded. Please check your API quota and billing settings, or wait for quota reset."
+          : "Could not generate your agenda. Please try again.",
         variant: "destructive",
       });
     } finally {

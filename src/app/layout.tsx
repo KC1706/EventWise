@@ -1,11 +1,12 @@
 import type { Metadata } from 'next';
 import './globals.css';
 import { LayoutProvider } from '@/components/layout-provider';
+import { AuthProvider } from '@/components/auth/auth-provider';
 import { Toaster } from '@/components/ui/toaster';
 
 export const metadata: Metadata = {
-  title: 'AIxMeet – Your Personal Event AI Companion',
-  description: 'Enhancing attendee experience at large-scale events like RAISE Summit using AI-first features.',
+  title: 'Eventwise – Your Personal Event AI Companion',
+  description: 'Enhancing attendee experience at large-scale events using AI-first features.',
 };
 
 export default function RootLayout({
@@ -23,8 +24,10 @@ export default function RootLayout({
           rel="stylesheet"
         />
       </head>
-      <body className="font-body antialiased">
-        <LayoutProvider>{children}</LayoutProvider>
+      <body className="font-body antialiased" suppressHydrationWarning>
+        <AuthProvider>
+          <LayoutProvider>{children}</LayoutProvider>
+        </AuthProvider>
         <Toaster />
       </body>
     </html>

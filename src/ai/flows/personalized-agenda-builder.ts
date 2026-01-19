@@ -8,7 +8,7 @@
  * - PersonalizedAgendaBuilderOutput - The return type for the personalizedAgendaBuilder function.
  */
 
-import {ai} from '@/ai/genkit';
+import {ai, getGeminiModel} from '@/ai/genkit';
 import {z} from 'genkit';
 
 const PersonalizedAgendaBuilderInputSchema = z.object({
@@ -105,10 +105,17 @@ export async function personalizedAgendaBuilder(
   return personalizedAgendaBuilderFlow(input);
 }
 
+// Get model reference and validate it
+const model = getGeminiModel('gemini-2.5-flash-lite');
+if (!model) {
+  throw new Error('Failed to get Gemini model. Check GOOGLE_AI_API_KEY and model name.');
+}
+
 const prompt = ai.definePrompt({
   name: 'personalizedAgendaBuilderPrompt',
   input: {schema: PersonalizedAgendaBuilderInputSchema},
   output: {schema: PersonalizedAgendaBuilderOutputSchema},
+  model: model,
   prompt: `You are an AI assistant that helps attendees build a personalized agenda for an event.
 
 You will receive the attendee's interests, goals, availability, and a list of available sessions.
@@ -147,8 +154,35 @@ const personalizedAgendaBuilderFlow = ai.defineFlow(
   },
   async input => {
     console.log('personalizedAgendaBuilderFlow input:', JSON.stringify(input, null, 2));
-    const {output} = await prompt(input);
-    console.log('personalizedAgendaBuilderFlow output:', JSON.stringify(output, null, 2));
-    return output!;
+    try {
+      if (!prompt) {
+        throw new Error('Prompt is undefined. Check if ai.definePrompt() succeeded.');
+      }
+      const result = await prompt(input);
+      if (!result) {
+        throw new Error('Prompt returned undefined result.');
+      }
+      const {output} = result;
+      console.log('personalizedAgendaBuilderFlow output:', JSON.stringify(output, null, 2));
+      if (!output) {
+        throw new Error('Prompt output is undefined.');
+      }
+      return output;
+    } catch (error: any) {
+      console.error('Error in personalizedAgendaBuilderFlow:', error);
+      
+      // Handle quota/billing errors with helpful messages
+      if (error?.status === 'RESOURCE_EXHAUSTED' || error?.code === 429) {
+        const quotaError = new Error(
+          'API quota exceeded. Please check your Google AI API quota and billing settings. ' +
+          'You may need to wait for quota reset or upgrade your plan. ' +
+          'Visit: https://ai.google.dev/gemini-api/docs/rate-limits'
+        );
+        quotaError.name = 'QuotaExceededError';
+        throw quotaError;
+      }
+      
+      throw error;
+    }
   }
 );

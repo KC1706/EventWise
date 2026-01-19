@@ -1,4 +1,4 @@
-# **App Name**: AIxMeet
+# **App Name**: Eventwise
 
 ## Core Features:
 

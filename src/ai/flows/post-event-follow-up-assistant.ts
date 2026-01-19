@@ -7,7 +7,7 @@
  * - PostEventFollowUpOutput - The return type for the postEventFollowUp function.
  */
 
-import {ai} from '@/ai/genkit';
+import {ai, getGeminiModel} from '@/ai/genkit';
 import {z} from 'genkit';
 
 const PostEventFollowUpInputSchema = z.object({
@@ -44,6 +44,7 @@ const prompt = ai.definePrompt({
   name: 'postEventFollowUpPrompt',
   input: {schema: PostEventFollowUpInputSchema},
   output: {schema: PostEventFollowUpOutputSchema},
+  model: getGeminiModel('gemini-2.5-flash-lite'),
   prompt: `You are an AI assistant helping attendees draft personalized follow-up emails after an event.
 
   The attendee's name is: {{{attendeeName}}}.

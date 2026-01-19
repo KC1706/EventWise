@@ -1,22 +1,54 @@
-// src/app/api/users/route.ts
 import { NextResponse } from 'next/server';
-import { openDb } from '@/app/database/db';
+import { userService } from '@/lib/firestore-service';
 
 export async function GET() {
-  const db = await openDb();
-  await db.exec(`CREATE TABLE IF NOT EXISTS users (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    name TEXT NOT NULL
-  )`);
-  const users = await db.all('SELECT * FROM users');
-  return NextResponse.json(users);
+  try {
+    const users = await userService.getAllUsers();
+    
+    // Convert Firestore Timestamps to ISO strings
+    const serializedUsers = users.map(user => ({
+      ...user,
+      createdAt: user.createdAt?.toDate().toISOString(),
+      updatedAt: user.updatedAt?.toDate().toISOString(),
+    }));
+
+    return NextResponse.json(serializedUsers);
+  } catch (error) {
+    console.error('Failed to fetch users:', error);
+    return NextResponse.json(
+      { message: 'Error fetching users', error: error instanceof Error ? error.message : 'Unknown error' },
+      { status: 500 }
+    );
+  }
 }
 
 export async function POST(request: Request) {
-  const { name } = await request.json();
-  if (!name) return NextResponse.json({ error: 'Name required' }, { status: 400 });
+  try {
+    const data = await request.json();
+    const { userId, email, name, ...otherData } = data;
 
-  const db = await openDb();
-  await db.run('INSERT INTO users (name) VALUES (?)', name);
-  return NextResponse.json({ message: 'User added' }, { status: 201 });
+    if (!userId || !email || !name) {
+      return NextResponse.json(
+        { error: 'userId, email, and name are required' },
+        { status: 400 }
+      );
+    }
+
+    // Create user in Firestore
+    await userService.createUser(userId, {
+      email,
+      name,
+      role: 'attendee',
+      interests: [],
+      ...otherData,
+    });
+
+    return NextResponse.json({ message: 'User created successfully', userId }, { status: 201 });
+  } catch (error) {
+    console.error('Failed to create user:', error);
+    return NextResponse.json(
+      { message: 'Error creating user', error: error instanceof Error ? error.message : 'Unknown error' },
+      { status: 500 }
+    );
+  }
 }

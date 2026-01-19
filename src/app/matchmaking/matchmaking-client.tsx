@@ -66,7 +66,7 @@ export function MatchmakingClient() {
       const userProfile = {
         name: "Alex Doe",
         title: "AI Enthusiast",
-        company: "AIxMeet Inc.",
+        company: "Eventwise Inc.",
         interests: ['AI', 'SaaS'],
         goals: "Find co-founders and learn about scaling AI applications.",
         avatar: "https://images.unsplash.com/photo-1552058544-f2b08422138a?q=80&w=300&h=300&fit=crop",

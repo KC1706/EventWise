@@ -5,6 +5,8 @@ import { organizerStats } from '@/lib/data';
 import dynamic from 'next/dynamic';
 import { useEffect, useState } from 'react';
 import type { ChartConfig } from "@/components/ui/chart";
+import { useAuth } from '@/components/auth/auth-provider';
+import { useRealtimeSessions } from '@/hooks/use-realtime';
 
 const SessionRatingsChart = dynamic(() => import('@/components/charts').then((mod) => mod.SessionRatingsChart), { ssr: false });
 const InterestDistributionChart = dynamic(() => import('@/components/charts').then((mod) => mod.InterestDistributionChart), { ssr: false });
@@ -17,14 +19,46 @@ const interestChartConfig = {
     "other": { label: "Other", color: "hsl(var(--chart-5))" },
 } satisfies ChartConfig;
 
-export default function DashboardClient() {
+interface DashboardClientProps {
+  eventId?: string;
+  organizerId?: string;
+}
+
+export default function DashboardClient({ eventId, organizerId }: DashboardClientProps) {
+    const { user } = useAuth();
     const [heatmapData, setHeatmapData] = useState<number[]>([]);
+    const [analytics, setAnalytics] = useState<any>(null);
+    const [loading, setLoading] = useState(true);
+    
+    // Use real-time sessions if eventId is provided
+    const { data: sessions } = useRealtimeSessions(eventId || '');
 
     useEffect(() => {
         // Generate random data on the client side to avoid hydration mismatch
         const data = Array.from({ length: 50 }).map(() => Math.random());
         setHeatmapData(data);
     }, []);
+
+    useEffect(() => {
+        async function fetchAnalytics() {
+            if (!eventId && !organizerId && !user) return;
+            
+            try {
+                const queryParam = eventId ? `eventId=${eventId}` : `organizerId=${organizerId || user?.uid}`;
+                const response = await fetch(`/api/organizer/analytics?${queryParam}`);
+                if (response.ok) {
+                    const data = await response.json();
+                    setAnalytics(data);
+                }
+            } catch (error) {
+                console.error('Error fetching analytics:', error);
+            } finally {
+                setLoading(false);
+            }
+        }
+        
+        fetchAnalytics();
+    }, [eventId, organizerId, user]);
 
     return (
         <div className="space-y-8">
@@ -45,7 +79,10 @@ export default function DashboardClient() {
                         <CardDescription>Breakdown of attendee interests.</CardDescription>
                     </CardHeader>
                     <CardContent>
-                        <InterestDistributionChart data={organizerStats.interestDistribution} config={interestChartConfig} />
+                        <InterestDistributionChart 
+                            data={analytics?.interestDistribution || organizerStats.interestDistribution} 
+                            config={interestChartConfig} 
+                        />
                     </CardContent>
                 </Card>
             </div>

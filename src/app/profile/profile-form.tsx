@@ -41,7 +41,7 @@ type ProfileFormValues = z.infer<typeof profileFormSchema>;
 
 const defaultValues: Partial<ProfileFormValues> = {
   name: "Alex Doe",
-  company: "AIxMeet Inc.",
+  company: "Eventwise Inc.",
   title: "AI Enthusiast",
   interests: ["ai", "dev"],
   goals: "I want to connect with other AI developers and find potential collaborators for a new project on ethical AI.",

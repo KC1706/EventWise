@@ -7,7 +7,7 @@
  * - MeetingWarmUpOutput - The return type for the generateMeetingWarmUp function.
  */
 
-import {ai} from '@/ai/genkit';
+import {ai, getGeminiModel} from '@/ai/genkit';
 import {z} from 'genkit';
 
 const AttendeeProfileSchema = z.object({
@@ -41,6 +41,7 @@ const prompt = ai.definePrompt({
   name: 'meetingWarmUpPrompt',
   input: {schema: MeetingWarmUpInputSchema},
   output: {schema: MeetingWarmUpOutputSchema},
+  model: getGeminiModel('gemini-2.5-flash-lite'),
   prompt: `You are an expert networking assistant. Your goal is to prepare an event attendee, {{{userProfile.name}}}, for a meeting with {{{matchProfile.name}}}.
 
 Generate a concise pre-meeting briefing.

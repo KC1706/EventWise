@@ -87,7 +87,7 @@ export function EventsClient() {
 
         <DialogContent className="sm:max-w-4xl">
             <DialogHeader>
-                <DialogTitle className="text-2xl">Register for AIxMeet</DialogTitle>
+                <DialogTitle className="text-2xl">Register for Eventwise</DialogTitle>
                 <DialogDescription>
                     Choose the pass that's right for you to access this session and more.
                 </DialogDescription>

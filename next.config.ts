@@ -23,8 +23,17 @@ const nextConfig: NextConfig = {
         pathname: '/**',
       }
     ],
+    formats: ['image/avif', 'image/webp'],
   },
   allowedDevOrigins: ['https://*.cloudworkstations.dev'],
+  // Performance optimizations
+  compress: true,
+  poweredByHeader: false,
+  reactStrictMode: true,
+  // Enable experimental features for better performance
+  experimental: {
+    optimizePackageImports: ['lucide-react', '@radix-ui/react-icons'],
+  },
 };
 
 export default nextConfig;

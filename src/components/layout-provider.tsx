@@ -47,7 +47,7 @@ export function LayoutProvider({ children }: { children: React.ReactNode }) {
         <SidebarHeader>
           <div className="flex items-center gap-2 p-2">
             <BrainCircuit className="w-8 h-8 text-primary" />
-            <h1 className="text-xl font-bold text-primary">AIxMeet</h1>
+            <h1 className="text-xl font-bold text-primary">Eventwise</h1>
           </div>
         </SidebarHeader>
         <SidebarContent>

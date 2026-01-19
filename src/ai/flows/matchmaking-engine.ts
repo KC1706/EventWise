@@ -9,7 +9,7 @@
  * - MatchmakingEngineOutput - The return type for the generateMatch function.
  */
 
-import {ai} from '@/ai/genkit';
+import {ai, getGeminiModel} from '@/ai/genkit';
 import {z} from 'genkit';
 
 const MatchmakingEngineInputSchema = z.object({
@@ -49,6 +49,7 @@ const prompt = ai.definePrompt({
   name: 'matchmakingEnginePrompt',
   input: {schema: MatchmakingEngineInputSchema},
   output: {schema: MatchmakingEngineOutputSchema},
+  model: getGeminiModel('gemini-2.5-flash-lite'),
   prompt: `You are an expert AI matchmaker for a professional conference. Your goal is to connect attendees for high-value networking opportunities.
 
 You will be given the profile of the user and a list of other attendees. For each attendee in the list, you must decide if they are a good match for the user.

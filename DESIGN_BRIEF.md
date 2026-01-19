@@ -1,6 +1,6 @@
-# AIxMeet: Comprehensive Feature Roadmap
+# Eventwise: Comprehensive Feature Roadmap
 
-This document outlines the expanded vision for the AIxMeet platform, detailing a comprehensive set of features for various user roles. It serves as a long-term development guide.
+This document outlines the expanded vision for the Eventwise platform, detailing a comprehensive set of features for various user roles. It serves as a long-term development guide.
 
 ---
 
